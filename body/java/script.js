@@ -1,205 +1,179 @@
-blackhole('#blackhole');
+console.clear()
 
+class Utils {
+  static randomRange(min, max) {
+    return Math.random() * (max - min) + min
+  }
 
-
-$(document).ready(function () {
-	$(".centerHover").on("click", function () {
-	setTimeout(function () {
-	  window.location.href = "selecttest.html"; // Change this to your target page
-	}, 2000);
-	});
-  });
-  
-  function blackhole(element) {
-	var h = $(element).height(),
-	    w = $(element).width(),
-	    cw = w,
-	    ch = h,
-	    maxorbit = 255, // distance from center
-	    centery = ch/2,
-	    centerx = cw/2;
-
-	var startTime = new Date().getTime();
-	var currentTime = 0;
-
-	var stars = [],
-	    collapse = false, // if hovered
-	    expanse = false; // if clicked
-
-	var canvas = $('<canvas/>').attr({width: cw, height: ch}).appendTo(element),
-	    context = canvas.get(0).getContext("2d");
-
-	context.globalCompositeOperation = "multiply";
-
-	function setDPI(canvas, dpi) {
-		// Set up CSS size if it's not set up already
-		if (!canvas.get(0).style.width)
-			canvas.get(0).style.width = canvas.get(0).width + 'px';
-		if (!canvas.get(0).style.height)
-			canvas.get(0).style.height = canvas.get(0).height + 'px';
-
-		var scaleFactor = dpi / 96;
-		canvas.get(0).width = Math.ceil(canvas.get(0).width * scaleFactor);
-		canvas.get(0).height = Math.ceil(canvas.get(0).height * scaleFactor);
-		var ctx = canvas.get(0).getContext('2d');
-		ctx.scale(scaleFactor, scaleFactor);
-	}
-
-	function rotate(cx, cy, x, y, angle) {
-		var radians = angle,
-		    cos = Math.cos(radians),
-		    sin = Math.sin(radians),
-		    nx = (cos * (x - cx)) + (sin * (y - cy)) + cx,
-		    ny = (cos * (y - cy)) - (sin * (x - cx)) + cy;
-		return [nx, ny];
-	}
-
-	setDPI(canvas, 192);
-
-	var star = function(){
-
-		// Get a weighted random number, so that the majority of stars will form in the center of the orbit
-		var rands = [];
-		rands.push(Math.random() * (maxorbit/2) + 1);
-		rands.push(Math.random() * (maxorbit/2) + maxorbit);
-
-		this.orbital = (rands.reduce(function(p, c) {
-			return p + c;
-		}, 0) / rands.length);
-		// Done getting that random number, it's stored in this.orbital
-
-		this.x = centerx; // All of these stars are at the center x position at all times
-		this.y = centery + this.orbital; // Set Y position starting at the center y + the position in the orbit
-
-		this.yOrigin = centery + this.orbital;  // this is used to track the particles origin
-
-		this.speed = (Math.floor(Math.random() * 2.5) + 1.5)*Math.PI/180; // The rate at which this star will orbit
-		this.rotation = 0; // current Rotation
-		this.startRotation = (Math.floor(Math.random() * 360) + 1)*Math.PI/180; // Starting rotation.  If not random, all stars will be generated in a single line.  
-
-		this.id = stars.length;  // This will be used when expansion takes place.
-
-		this.collapseBonus = this.orbital - (maxorbit * 0.7); // This "bonus" is used to randomly place some stars outside of the blackhole on hover
-		if(this.collapseBonus < 0){ // if the collapse "bonus" is negative
-			this.collapseBonus = 0; // set it to 0, this way no stars will go inside the blackhole
-		}
-
-		stars.push(this);
-		this.color = 'rgba(255,255,255,'+ (1 - ((this.orbital) / 255)) +')'; // Color the star white, but make it more transparent the further out it is generated
-
-		this.hoverPos = centery + (maxorbit/2) + this.collapseBonus;  // Where the star will go on hover of the blackhole
-		this.expansePos = centery + (this.id%100)*-10 + (Math.floor(Math.random() * 20) + 1); // Where the star will go when expansion takes place
-
-
-		this.prevR = this.startRotation;
-		this.prevX = this.x;
-		this.prevY = this.y;
-
-		// The reason why I have yOrigin, hoverPos and expansePos is so that I don't have to do math on each animation frame.  Trying to reduce lag.
-	}
-	star.prototype.draw = function(){
-		// the stars are not actually moving on the X axis in my code.  I'm simply rotating the canvas context for each star individually so that they all get rotated with the use of less complex math in each frame.
-
-
-
-		if(!expanse){
-			this.rotation = this.startRotation + (currentTime * this.speed);
-			if(!collapse){ // not hovered
-				if(this.y > this.yOrigin){
-					this.y-= 2.5;
-				}
-				if(this.y < this.yOrigin-4){
-					this.y+= (this.yOrigin - this.y) / 10;
-				}
-			} else { // on hover
-				this.trail = 1;
-				if(this.y > this.hoverPos){
-					this.y-= (this.hoverPos - this.y) / -5;
-				}
-				if(this.y < this.hoverPos-4){
-					this.y+= 2.5;
-				}
-			}
-		} else {
-			this.rotation = this.startRotation + (currentTime * (this.speed / 2));
-			if(this.y > this.expansePos){
-				this.y-= Math.floor(this.expansePos - this.y) / -140;
-			}
-		}
-
-		context.save();
-		context.fillStyle = this.color;
-		context.strokeStyle = this.color;
-		context.beginPath();
-		var oldPos = rotate(centerx,centery,this.prevX,this.prevY,-this.prevR);
-		context.moveTo(oldPos[0],oldPos[1]);
-		context.translate(centerx, centery);
-		context.rotate(this.rotation);
-		context.translate(-centerx, -centery);
-		context.lineTo(this.x,this.y);
-		context.stroke();
-		context.restore();
-
-
-		this.prevR = this.rotation;
-		this.prevX = this.x;
-		this.prevY = this.y;
-	}
-
-
-	$('.centerHover').on('click',function(){
-		collapse = false;
-		expanse = true;
-
-		$(this).addClass('open');
-		$('.fullpage').addClass('open');
-		setTimeout(function(){
-			$('.header .welcome').removeClass('gone');
-		}, 500);
-	});
-	$('.centerHover').on('mouseover',function(){
-		if(expanse == false){
-			collapse = true;
-		}
-	});
-	$('.centerHover').on('mouseout',function(){
-		if(expanse == false){
-			collapse = false;
-		}
-	});
-
-	window.requestFrame = (function(){
-		return  window.requestAnimationFrame       ||
-			window.webkitRequestAnimationFrame ||
-			window.mozRequestAnimationFrame    ||
-			function( callback ){
-			window.setTimeout(callback, 1000 / 60);
-		};
-	})();
-
-	function loop(){
-		var now = new Date().getTime();
-		currentTime = (now - startTime) / 50;
-
-		context.fillStyle = 'rgba(25,25,25,0.2)'; // somewhat clear the context, this way there will be trails behind the stars 
-		context.fillRect(0, 0, cw, ch);
-
-		for(var i = 0; i < stars.length; i++){  // For each star
-			if(stars[i] != stars){
-				stars[i].draw(); // Draw it
-			}
-		}
-
-		requestFrame(loop);
-	}
-
-	function init(time){
-		context.fillStyle = 'rgba(25,25,25,1)';  // Initial clear of the canvas, to avoid an issue where it all gets too dark
-		context.fillRect(0, 0, cw, ch);
-		for(var i = 0; i < 10000; i++){  // create 2500 stars
-			new star();
-		}
-		loop();
-	}
-	init();
+  static mapRange (value, inputMin, inputMax, outputMin, outputMax, clamp) {
+    if (Math.abs(inputMin - inputMax) < Number.EPSILON) {
+      return outputMin;
+    } else {
+      var outVal = ((value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) + outputMin);
+      if (clamp) {
+        if (outputMax < outputMin) {
+          if (outVal < outputMax) outVal = outputMax;
+          else if (outVal > outputMin) outVal = outputMin;
+        } else {
+          if (outVal > outputMax) outVal = outputMax;
+          else if (outVal < outputMin) outVal = outputMin;
+        }
+      }
+      return outVal;
+    }
+  }
 }
+
+Utils.simplex = new SimplexNoise('seed') 
+
+class App {
+  constructor() {
+    this.config = {
+      bgColor: chroma({ h: 230, s: 0.5, l: 0.92}).hex(),
+      // https://www.colourlovers.com/palette/577622/One_Sixty-Eight
+      colorSchema: [
+        '#5E9FA3',
+        '#DCD1B4',
+        '#FAB87F',
+        '#F87E7B',
+        '#B05574',
+      ],
+      numOfLayers: 9
+    }
+    
+    this.canvas = document.getElementById('c')
+    this.ctx = this.canvas.getContext('2d')
+    
+    this.shadowCanvas = document.createElement('canvas')
+    this.shadowCtx = this.shadowCanvas.getContext('2d')
+    
+    this.timestamp = 0
+    this.fpsHistory = []
+    
+    this.setUpVars()
+    this.setUpListeners()
+    // this.setUpGui()
+    this.update()
+  }
+
+  setUpGui() {
+    const pane = new Tweakpane()
+    const folder = pane.addFolder({
+      expanded: false,
+      title: 'Settings',
+    })
+    folder.addInput(this.config, 'bgColor')
+  }
+  
+  setUpVars() {
+    this.canvas.width = this.shadowCanvas.width = this.wWidth = window.innerWidth
+    this.canvas.height = this.shadowCanvas.height = this.wHeight = window.innerHeight
+    this.wCenterX = this.wWidth / 2
+    this.wCenterY = this.wHeight / 2
+    this.wHypot = Math.hypot(this.wWidth, this.wHeight)
+    this.wMin = Math.min(this.wWidth, this.wHeight)
+    
+    this.angle = Math.PI * 0.25
+    this.layers = this.getLayers()
+  }
+
+  getLayers() {
+    const layers = []
+    let currColorId = 0
+    
+    for (let lid = 0; lid <= this.config.numOfLayers; lid++) {
+      const colorAngle = Math.PI * 2 * (lid / this.config.numOfLayers)
+      
+      layers.push({
+        id: lid, // used for noise offset
+        progress: 1 - (lid / this.config.numOfLayers),
+        color: this.config.colorSchema[currColorId]
+      })
+
+      currColorId++
+      
+      if (currColorId >= this.config.colorSchema.length) {
+        currColorId = 0
+      }
+    }
+    
+    return layers
+  }
+  
+  setUpListeners() {
+    window.addEventListener('resize', this.setUpVars.bind(this))
+  }
+
+  drawLayer(ctx, layer) {
+    const segmentBaseSize = 10
+    const segmentCount = Math.round(this.wHypot / segmentBaseSize)
+    const segmentSize = this.wHypot / segmentCount
+    const waveAmplitude = segmentSize * 4
+    const noiseZoom = 0.03
+    
+    ctx.save()
+    ctx.translate(this.wCenterX, this.wCenterY)
+    ctx.rotate(Math.sin(this.angle))
+    
+    ctx.beginPath()
+    ctx.moveTo(-this.wHypot / 2, this.wHypot / 2 - (this.wHypot * layer.progress))
+    ctx.lineTo(-this.wHypot / 2, this.wHypot / 2)
+    ctx.lineTo(this.wHypot / 2, this.wHypot / 2)
+    ctx.lineTo(this.wHypot / 2, this.wHypot / 2 - (this.wHypot * layer.progress))
+    
+    for (let sid = 1; sid <= segmentCount; sid++) {
+      const n = Utils.simplex.noise3D(sid * noiseZoom, sid * noiseZoom, layer.id + this.timestamp)
+      const heightOffset = n * waveAmplitude
+      
+      ctx.lineTo((this.wHypot / 2) - (sid * segmentSize), this.wHypot / 2 - (this.wHypot * layer.progress) + heightOffset)
+    }
+    
+    ctx.closePath()
+    ctx.fillStyle = layer.color
+    ctx.fill()
+    ctx.restore()
+  }
+  
+  draw(ctx) {
+    ctx.save()
+    ctx.fillStyle = this.config.bgColor
+    ctx.fillRect(0, 0, this.wWidth, this.wHeight)
+    ctx.restore()
+    
+    this.layers.forEach(layer => this.drawLayer(ctx, layer))
+  }
+  
+  update(t) {
+    const prevTimestamp = this.timestamp * 5000
+    
+    if (t) {
+      let shiftNeeded = false
+      this.timestamp = t / 5000
+      this.angle += 0.001
+      
+      this.layers.forEach(layer => {
+        layer.progress += 0.001
+        
+        if (layer.progress > 1 + (1 / (this.layers.length - 1))) {
+          layer.progress = 0
+          shiftNeeded = true
+        }
+      })
+      
+      if (shiftNeeded) {
+        this.layers.push(this.layers.shift())
+      }
+      
+      this.draw(this.shadowCtx)
+    }
+    
+    this.ctx.clearRect(0, 0, this.wWidth, this.wHeight)
+    this.ctx.drawImage(this.shadowCanvas, 0, 0)
+    
+
+    
+    window.requestAnimationFrame(this.update.bind(this))
+  }
+}
+
+new App()
