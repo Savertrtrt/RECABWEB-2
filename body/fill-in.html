@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill in the Blanks Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        .blank {
+            width: 100px;
+            text-align: center;
+        }
+        #result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Fill in the Blanks - Conversation Game</h1>
+    <p id="dialogue"></p>
+    
+    <br>
+    <button onclick="checkAnswers()">Check Answers</button>
+    <button onclick="loadNewDialogue()">New Dialogue</button>
+    <p id="result"></p>
+
+    <script>
+        const dialogues = [
+            { // A1 (Beginner)
+                text: `Tom: "Hi! How are you?"<br>
+                       Anna: "I am <input type="text" class="blank" id="blank1">, thank you!"<br>
+                       Tom: "Do you like <input type="text" class="blank" id="blank2">?"<br>
+                       Anna: "Yes, I like <input type="text" class="blank" id="blank3">."`,
+                answers: ["fine", "pizza", "pizza"]
+            },
+            { // A2 (Elementary)
+                text: `Mike: "Where is the <input type="text" class="blank" id="blank1">?"<br>
+                       Lucy: "It is next to the <input type="text" class="blank" id="blank2">."<br>
+                       Mike: "Thank you! I need to buy some <input type="text" class="blank" id="blank3">."`,
+                answers: ["supermarket", "bank", "bread"]
+            },
+            { // B1 (Intermediate)
+                text: `Emma: "Did you watch the movie <input type="text" class="blank" id="blank1">?"<br>
+                       Jake: "Yes, it was really <input type="text" class="blank" id="blank2">!"<br>
+                       Emma: "I know! The ending was so <input type="text" class="blank" id="blank3">."`,
+                answers: ["yesterday", "exciting", "unexpected"]
+            },
+            { // B2 (Upper Intermediate)
+                text: `Sara: "I need to finish my project by <input type="text" class="blank" id="blank1">."<br>
+                       Leo: "That sounds <input type="text" class="blank" id="blank2">. Do you need help?"<br>
+                       Sara: "Yes, I need to research <input type="text" class="blank" id="blank3">."`,
+                answers: ["tomorrow", "stressful", "information"]
+            }
+        ];
+
+        let currentDialogue = {};
+
+        function loadNewDialogue() {
+            let randomIndex = Math.floor(Math.random() * dialogues.length);
+            currentDialogue = dialogues[randomIndex];
+
+            document.getElementById("dialogue").innerHTML = currentDialogue.text;
+            document.getElementById("result").innerHTML = ""; // Clear previous result
+        }
+
+        function checkAnswers() {
+            let blanks = document.getElementsByClassName("blank");
+            let userAnswers = Array.from(blanks).map(input => input.value.trim().toLowerCase());
+            let correctAnswers = currentDialogue.answers;
+
+            let resultText = document.getElementById("result");
+
+            if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers)) {
+                resultText.innerHTML = "✅ Correct! Well done!";
+                resultText.style.color = "green";
+            } else {
+                resultText.innerHTML = "❌ Incorrect! Try again.";
+                resultText.style.color = "red";
+            }
+        }
+
+        // Load a random dialogue on page load
+        loadNewDialogue();
+    </script>
+
+</body>
+</html>
