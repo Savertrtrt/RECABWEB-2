@@ -1,3 +1,4 @@
+
 console.clear()
 
 class Utils {
@@ -99,6 +100,7 @@ class App {
     
     return layers
   }
+  
   
   setUpListeners() {
     window.addEventListener('resize', this.setUpVars.bind(this))

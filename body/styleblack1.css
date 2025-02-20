@@ -1,6 +1,25 @@
 body {
-	position: relative;
-	overflow: hidden;
+		margin: 0;
+		overflow: hidden;
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		align-items: center;
+		height: 100vh; 
+      	background: #000;
+	}
+    h1 {
+      font-size: 3rem;
+      color: #955700;
+      cursor: pointer;
+      transition: color 0.3s ease;
+	  position: center;
+	  align-items: center;
+    }
+    h1:hover {
+      color: #ff0000;
+	  position: center;
   }
   body::after {
 	content: "";
