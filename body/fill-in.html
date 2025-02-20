@@ -14,17 +14,46 @@
             width: 100px;
             text-align: center;
         }
+        .dialogue {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        #dialogue input {
+            border: 0.2px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        #dialogue {
+            font-size: 18px;
+            line-height: 1.5;
+        }
         #result {
             font-size: 20px;
             font-weight: bold;
             margin-top: 20px;
+        }
+        body button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
 
     <h1>Fill in the Blanks - Conversation Game</h1>
-    <p id="dialogue"></p>
+    <div class="dialogue">
+        <p id="dialogue"></p>
+    </div>
     
     <br>
     <button onclick="checkAnswers()">Check Answers</button>
@@ -76,6 +105,15 @@
             let correctAnswers = currentDialogue.answers;
 
             let resultText = document.getElementById("result");
+
+            // Loop through user answers and correct answers to compare and count correct answers
+            userAnswers.map((answer, index) => {
+                if (answer === correctAnswers[index]) {
+                    blanks[index].style.backgroundColor = "lightgreen";
+                } else {
+                    blanks[index].style.backgroundColor = "lightcoral";
+                }
+            });
 
             if (JSON.stringify(userAnswers) === JSON.stringify(correctAnswers)) {
                 resultText.innerHTML = "✅ Correct! Well done!";
