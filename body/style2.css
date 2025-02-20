@@ -2,10 +2,9 @@
    font-family: 'Inter';
    line-height: 1.6;
    margin: 20px;
-   background-image: url(/images/4k-space-purple-nebula-9l0wgukn25jl3pgq.jpg);
+   background-color: #6f8591;
    background-size: 100%;
    background-position: contain;
-   background-color: rgba(0, 0, 0, .25);
    display: flex;
     justify-content: center;
     align-items: center;
@@ -15,11 +14,7 @@
  h1 {
    font-size: 40px;
    text-align: center;
-   color: #ff0000;
- }
- 
- a {
-    color: #ff0000;
+   color: #ffffff;
  }
 
  p {
@@ -137,12 +132,19 @@
    background-color: #ad5252;
  }
 
-a:visited {
+a {
+  font-family: "Inter";
   color: white;
-  background-color: transparent;
+  background-color: skyblue;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
   text-decoration: none;
 }
+
 h4 {
-  color: darkgreen;
+  font-family: "Inter";
+  color: white;
+  color: rgb(255, 255, 255);
   
 }
