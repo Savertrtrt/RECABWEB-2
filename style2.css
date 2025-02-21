@@ -1,4 +1,7 @@
- h2 {
+@import "tailwindcss";
+
+
+h2 {
    font-size: 50px;
    text-align: center;
    color: #378039;
